@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: test # 替换为实际的Deployment名称
+spec:
+  replicas: 1 # 副本数，可以按需调整
+  selector:
+    matchLabels:
+      app: stress-job # 用于匹配Pod的标签
+  template:
+    metadata:
+      labels:
+        app: stress-job # 与selector中的matchLabels一致
+    spec:
+      containers:
+        - name: job
+          image: polinux/stress
+          resources:
+            requests:
+              memory: 500Mi
+              cpu: 1
+              ephemeral-storage: 8Gi
+          command: ["/bin/sh", "-c"]
+          args: ["stress --cpu 1 --vm 1 --vm-bytes 500M --vm-hang 1"]
+      restartPolicy: Always # Deployment中的Pod使用Always作为重启策略

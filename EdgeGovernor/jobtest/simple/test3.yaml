@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: menet
+  name: test3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stress-job
+  template:
+    metadata:
+      labels:
+        app: stress-job
+    spec:
+      containers:
+        - name: job
+          image: polinux/stress
+          resources:
+            requests:
+              memory: 370Mi
+              cpu: 0.9
+              ephemeral-storage: 5Gi
+          command: ["/bin/sh", "-c"]
+          args: ["stress --vm 1 --hdd 1 --hdd-bytes 5G --vm-bytes 370M --vm-hang 1"]
+      restartPolicy: Always

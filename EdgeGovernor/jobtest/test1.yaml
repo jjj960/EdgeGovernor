@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: menet
+  name: test1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stress-job
+  template:
+    metadata:
+      labels:
+        app: stress-job
+    spec:
+      containers:
+        - name: job
+          image: polinux/stress
+          resources:
+            requests:
+              memory: 400Mi
+              cpu: 1
+              ephemeral-storage: 3Gi
+          command: ["/bin/sh", "-c"]
+          args: ["stress --vm 1 --cpu 1 --vm-bytes 1G --vm-hang 1"] # 注意：这里我假设MEMORY_STRESS_PLACEHOLDER为1G作为示例
+      restartPolicy: Always
