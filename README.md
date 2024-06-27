@@ -40,6 +40,7 @@ To evaluate the performance of EdgeGovernor in the autonomous management of edge
 We use the comprehensive resource standard deviation metric of the cluster to evaluate the performance indicators of EdgeGovernor's task scheduling algorithm. The lower the value of this metric, the more uniform the distribution of resources.
 
 Assuming a cluster is built by $n$ each of which has $m$ types of resources. The resource utilization rate of a single resource on a node is defined as $A(i,j)$, where $i$ represents different nodes and $j$ represents the resources on the node; The average value of the total utilization of all resources on a defined node is $A_{avg}$; $Z(i)$ represents the sum of standard deviations of resources on node $i$; $Z_{avg}$ is the sum of the standard deviations of the average resources in the cluster, and the smaller its value, the more uniform the distribution of resources in the cluster. Resources on nodes are not easily skewed, which can provide more resources for the cluster to deploy tasks.
+
 $$
 A_{avg}=\sum_{j=1}^{m} \frac {A(i,j)}{m}
 $$
