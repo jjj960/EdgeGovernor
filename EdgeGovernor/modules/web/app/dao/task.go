@@ -2,11 +2,16 @@ package dao
 
 import (
 	"EdgeGovernor/pkg/cache/task"
+	"EdgeGovernor/pkg/constants"
+	"EdgeGovernor/pkg/database/duckdb"
 	"EdgeGovernor/pkg/database/etcd/resource"
 	docker "EdgeGovernor/pkg/docker/resource"
 	"EdgeGovernor/pkg/k8s"
+	"EdgeGovernor/pkg/models"
 	"EdgeGovernor/pkg/utils"
+	"fmt"
 	"strconv"
+	"time"
 )
 
 func CheckTaskNode(taskName string, taskNode string) bool {
@@ -61,6 +66,17 @@ func DeleteTask(taskName string) {
 	}
 	resource.DeleteTask(taskName)
 	task.DeleteNodeTask(tasks.DeployNode, tasks.Name)
+	id, _ := utils.GetID()
+	logEntry := models.OperationLog{
+		ID:            id,
+		NodeName:      constants.Hostname,
+		NodeIP:        constants.IP,
+		OperationType: "delete task",
+		Description:   fmt.Sprintf("Task %s deleted", taskName),
+		Result:        true,
+		CreatedAt:     time.Now(),
+	}
+	duckdb.InsertOperationLog(logEntry)
 }
 
 func UpdateTaskMsg(taskName string, targetNode string) {

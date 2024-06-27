@@ -3,12 +3,14 @@ package workflow
 import (
 	algorithm2 "EdgeGovernor/pkg/cache/algorithm"
 	"EdgeGovernor/pkg/constants"
+	"EdgeGovernor/pkg/database/duckdb"
 	"EdgeGovernor/pkg/k8s"
 	"EdgeGovernor/pkg/models"
 	"EdgeGovernor/pkg/utils"
 	"fmt"
 	"log"
 	"strings"
+	"time"
 )
 
 func workflowPublish(wf models.Workflow) error {
@@ -42,6 +44,17 @@ func JobPublish(job models.Job, workflowName string, schedulingAlgorithm string)
 	if constants.ClusterStatus == "coordination" {
 		_, errs := k8s.CreatePod(maxHost, job.Name, job.Image, workflowName, dataDir)
 		if errs != nil {
+			id, _ := utils.GetID()
+			logEntry := models.OperationLog{
+				ID:            id,
+				NodeName:      constants.Hostname,
+				NodeIP:        constants.IP,
+				OperationType: "workflow job deployment",
+				Description:   fmt.Sprintf("Job %s in workflow %s failed to publish", job.Name, job.WorkflowName),
+				Result:        true,
+				CreatedAt:     time.Now(),
+			}
+			duckdb.InsertOperationLog(logEntry)
 			return errs
 		}
 		job.WorkflowName = workflowName
@@ -59,6 +72,18 @@ func JobPublish(job models.Job, workflowName string, schedulingAlgorithm string)
 		jsonData, err := utils.Jsoniter.Marshal(job)
 		if err != nil {
 			fmt.Println("Error:", err)
+			id, _ := utils.GetID()
+			logEntry := models.OperationLog{
+				ID:            id,
+				NodeName:      constants.Hostname,
+				NodeIP:        constants.IP,
+				OperationType: "workflow job deployment",
+				Description:   fmt.Sprintf("Job %s in workflow %s failed to publish", job.Name, job.WorkflowName),
+				Result:        true,
+				CreatedAt:     time.Now(),
+			}
+			duckdb.InsertOperationLog(logEntry)
+			return err
 		}
 		utils.SingleSend(ip, maxHost, "workflow job deployment", string(jsonData))
 

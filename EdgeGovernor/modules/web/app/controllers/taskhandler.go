@@ -3,8 +3,11 @@ package controllers
 import (
 	"EdgeGovernor/modules/taskDeploy/simple"
 	"EdgeGovernor/modules/web/app/dao"
+	"EdgeGovernor/pkg/constants"
+	"EdgeGovernor/pkg/database/duckdb"
 	"EdgeGovernor/pkg/k8s"
 	"EdgeGovernor/pkg/models"
+	"EdgeGovernor/pkg/utils"
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
@@ -108,12 +111,35 @@ func MigrationTask(c echo.Context) error {
 		dao.UpdateTaskMsg(taskName, targetNode)
 		_, err := k8s.UpdatePodNode(taskName, targetNode)
 		if err != nil {
+			id, _ := utils.GetID()
+			logEntry := models.OperationLog{
+				ID:            id,
+				NodeName:      constants.Hostname,
+				NodeIP:        constants.IP,
+				OperationType: "task migration",
+				Description:   fmt.Sprintf("The user with IP address %s is attempting to migrate task %s, and the result is %s", c.RealIP(), taskName, "fail"),
+				Result:        true,
+				CreatedAt:     time.Now(),
+			}
+			duckdb.InsertOperationLog(logEntry)
 			return err
 		}
 	} else {
 		log.Println("The task")
 		return errors.New("The task does not meet the migration criteria.")
 	}
+
+	id, _ := utils.GetID()
+	logEntry := models.OperationLog{
+		ID:            id,
+		NodeName:      constants.Hostname,
+		NodeIP:        constants.IP,
+		OperationType: "task migration",
+		Description:   fmt.Sprintf("The user with IP address %s is attempting to migrate task %s, and the result is %s", c.RealIP(), taskName, "success"),
+		Result:        true,
+		CreatedAt:     time.Now(),
+	}
+	duckdb.InsertOperationLog(logEntry)
 
 	return c.String(http.StatusOK, "成功")
 }

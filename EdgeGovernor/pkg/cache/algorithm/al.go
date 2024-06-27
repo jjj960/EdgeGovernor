@@ -20,6 +20,13 @@ func AddAlgorithmStatus(name, url, types, status string) error {
 	return nil
 }
 
+func GetAlgorithmMsg(alName string) AlgorithmStatus {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	return AlgorithmStatusMap[alName]
+}
+
 // 获取特定算法的状态
 func GetAlgorithmStatus(name string) string {
 	mutex.RLock()
@@ -78,6 +85,34 @@ func DeleteAlgorithmStatus(name string) error {
 		return nil
 	}
 	return fmt.Errorf("Algorithm %s not found", name)
+}
+
+func GetAlgorithmNames() []string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	var names []string
+	for key := range AlgorithmStatusMap {
+		names = append(names, key)
+	}
+	return names
+}
+
+func GetAlgorithmsMsg() []map[string]string {
+	mutex.RLock()
+	defer mutex.RUnlock()
+	var newmap []map[string]string
+
+	for key := range AlgorithmStatusMap {
+		newmap = append(newmap, map[string]string{
+			"name":   AlgorithmStatusMap[key].Name,
+			"mirror": AlgorithmStatusMap[key].Status,
+			"URL":    AlgorithmStatusMap[key].URL,
+			"detail": AlgorithmStatusMap[key].Type,
+		})
+
+	}
+	return newmap
 }
 
 // 输出整个全局 map 的内容

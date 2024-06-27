@@ -2,6 +2,8 @@ package main
 
 import (
 	"EdgeGovernor/modules/comm/gRPC"
+	"EdgeGovernor/modules/resourceCheck"
+	"EdgeGovernor/modulesControl"
 	"EdgeGovernor/pkg/cache/algorithm"
 	"EdgeGovernor/pkg/constants"
 	"EdgeGovernor/pkg/database/duckdb"
@@ -9,32 +11,32 @@ import (
 	"EdgeGovernor/pkg/utils"
 	"github.com/bwmarrin/snowflake"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
 func main() {
-	duckdb.InsertHostload()
-	duckdb.SelectAllHostloads()
-	//modulesControl.CMC = modulesControl.NewCMC()
-	//modulesControl.FMC = modulesControl.NewFMC()
-	//modulesControl.MMC = modulesControl.NewMMC()
-	//
-	//modulesControl.CMC.Start()
-	//
-	//if !utils.IsFirstRun() && constants.Hostname == "cloud" {
-	//	modulesControl.FMC.Start()
-	//} else if constants.Hostname == constants.Leader {
-	//	modulesControl.MMC.Start()
-	//} else {
-	//	modulesControl.FMC.Start()
-	//}
-	//
-	//go resourceCheck.JobCheckMonitor()
-	//go modulesControl.ListenModulesChannel()
-	//
-	//sigCh := make(chan os.Signal, 1)
-	//signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-	//<-sigCh
+	modulesControl.CMC = modulesControl.NewCMC()
+	modulesControl.FMC = modulesControl.NewFMC()
+	modulesControl.MMC = modulesControl.NewMMC()
+
+	modulesControl.CMC.Start()
+
+	if !utils.IsFirstRun() && constants.Hostname == "cloud" {
+		modulesControl.FMC.Start()
+	} else if constants.Hostname == constants.Leader {
+		modulesControl.MMC.Start()
+	} else {
+		modulesControl.FMC.Start()
+	}
+
+	go resourceCheck.JobCheckMonitor()
+	go modulesControl.ListenModulesChannel()
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	<-sigCh
 }
 
 func init() {

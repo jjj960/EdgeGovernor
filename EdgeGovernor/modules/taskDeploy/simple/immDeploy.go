@@ -5,6 +5,7 @@ import (
 	algorithm2 "EdgeGovernor/pkg/cache/algorithm"
 	task2 "EdgeGovernor/pkg/cache/task"
 	"EdgeGovernor/pkg/constants"
+	"EdgeGovernor/pkg/database/duckdb"
 	"EdgeGovernor/pkg/database/etcd/resource"
 	"EdgeGovernor/pkg/k8s"
 	"EdgeGovernor/pkg/models"
@@ -13,6 +14,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func taskPublish(task *models.Task) error {
@@ -71,6 +73,18 @@ func taskPublish(task *models.Task) error {
 			}
 
 		}
+		id, _ := utils.GetID()
+		logEntry := models.OperationLog{
+			ID:            id,
+			NodeName:      constants.Hostname,
+			NodeIP:        constants.IP,
+			OperationType: "task deployment",
+			Description:   fmt.Sprintf("The deployment result of task %s is %s", task.Name, re),
+			Result:        true,
+			CreatedAt:     time.Now(),
+		}
+		duckdb.InsertOperationLog(logEntry)
+
 		if re == "success" {
 			fmt.Println("结果为:", re)
 			fmt.Println(task.Name, maxHost, cpu)

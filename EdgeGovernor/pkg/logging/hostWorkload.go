@@ -41,10 +41,10 @@ func GetHostWorkload() []byte { //获取主机负载
 	}
 	selfRole, _ := utils.NodeTables.GetNodeRole(constants.Hostname)
 	if selfRole == "Leader" && (cpupercent[0] >= 80.0 || mempercent >= 80.0) {
-		id := utils.SnowFlake.Generate()
+		id, time := utils.GetID()
 		utils.AlarmMsgChannel <- models.Msg{
-			ID:           id.Int64(),
-			GenerateTime: id.Time(),
+			ID:           id,
+			GenerateTime: time,
 			Tpye:         "Host Resource warning",
 			Detail:       []byte(fmt.Sprintf("Node %s has insufficient resources, CPU load is %f, memory load is %f", hostname, cpupercent, mempercent)),
 			Status:       false,

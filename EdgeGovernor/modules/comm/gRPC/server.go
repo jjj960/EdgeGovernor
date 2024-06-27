@@ -6,6 +6,7 @@ import (
 	"EdgeGovernor/pkg/cache/algorithm"
 	"EdgeGovernor/pkg/cache/task"
 	"EdgeGovernor/pkg/constants"
+	"EdgeGovernor/pkg/database/duckdb"
 	"EdgeGovernor/pkg/docker/resource"
 	"EdgeGovernor/pkg/logging"
 	"EdgeGovernor/pkg/models"
@@ -128,6 +129,17 @@ func (s *server) Messaging(ctx context.Context, in *proto.Request) (*proto.Respo
 	case "candidate update": //更新集群的最新候选人
 		constants.Candidate = detail
 		fmt.Println("Update Candidate to:", detail)
+		id, _ := utils.GetID()
+		logEntry := models.OperationLog{
+			ID:            id,
+			NodeName:      constants.Hostname,
+			NodeIP:        constants.IP,
+			OperationType: "candidate update",
+			Description:   fmt.Sprintf("candidate update to: %s", detail),
+			Result:        true,
+			CreatedAt:     time.Now(),
+		}
+		duckdb.InsertOperationLog(logEntry)
 
 	case "leader election": //该消息只有Candidate才能收到，收到消息后负责收集各个节点的负载数据，选举出新领导者
 
@@ -142,6 +154,17 @@ func (s *server) Messaging(ctx context.Context, in *proto.Request) (*proto.Respo
 			}
 			newLeader := strings.ReplaceAll(result, "\"", "")
 			fmt.Println("After evaluation, the new Leader is:", newLeader)
+			id, _ := utils.GetID()
+			logEntry := models.OperationLog{
+				ID:            id,
+				NodeName:      constants.Hostname,
+				NodeIP:        constants.IP,
+				OperationType: "leader election",
+				Description:   fmt.Sprintf("Start the leader election initiated by node %s", constants.Hostname),
+				Result:        true,
+				CreatedAt:     time.Now(),
+			}
+			duckdb.InsertOperationLog(logEntry)
 			if constants.Hostname == newLeader { //如果选举出的新领导者为自己
 				utils.Broadcast("leader change", newLeader)
 				utils.ModuleControlChannel <- false
@@ -156,6 +179,18 @@ func (s *server) Messaging(ctx context.Context, in *proto.Request) (*proto.Respo
 
 	case "leader elected": //当选举出新领导者后，通知该节点，该节点会收到消息
 		fmt.Println("This node has received a message and has been selected as the new leader")
+		id, _ := utils.GetID()
+		logEntry := models.OperationLog{
+			ID:            id,
+			NodeName:      constants.Hostname,
+			NodeIP:        constants.IP,
+			OperationType: "leader elected",
+			Description:   fmt.Sprintf("Node %s has become a new leader in the cluster", constants.Hostname),
+			Result:        true,
+			CreatedAt:     time.Now(),
+		}
+		duckdb.InsertOperationLog(logEntry)
+
 		workflow.GetBackupworkflowQueue()
 		utils.GetNodeTablesMap()
 		algorithm.GetAlgorithmStatusMap()

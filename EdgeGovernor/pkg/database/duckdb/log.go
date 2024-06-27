@@ -7,16 +7,6 @@ import (
 	"log"
 )
 
-//logEntry := models.OperationLog{
-//ID:            a,
-//NodeName:      "Node1",
-//NodeIP:        "192.168.1.1",
-//OperationType: "Update",
-//Description:   "Update system configuration",
-//Result:        true,
-//CreatedAt:     time.Now(),
-//}
-
 // createTableOperationLog 函数用于创建OperationLog表
 func CreateTableOperationLog() {
 	_, err := utils.DuckDBCli.Exec(`

@@ -46,6 +46,12 @@ func (ws *WebServer) registerRoutes() {
 	e.POST("/deleteWorkflow", controllers.DeleteWorkflow)
 	e.POST("/getWorkflowNum", controllers.GetWorkflowNum)
 
+	/*算法相关操作*/
+	e.POST("/addAlgorithm", controllers.AddAlgorithm)
+	e.GET("/getAlgorithmName", controllers.GetAlgorithmName)
+	e.GET("/getAlgorithm", controllers.GetAlgorithm)
+	e.POST("/searchAlgorithm", controllers.SearchAlgorithm)
+
 	/*集群负载相关操作*/
 	e.POST("/getbarData", controllers.GetBarData)
 

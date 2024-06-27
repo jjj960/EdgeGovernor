@@ -1,11 +1,15 @@
 package workflow
 
 import (
+	"EdgeGovernor/pkg/constants"
+	"EdgeGovernor/pkg/database/duckdb"
 	"EdgeGovernor/pkg/models"
 	"EdgeGovernor/pkg/utils"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
+	"time"
 )
 
 func AddWorkflow(wf *models.PostWorkflow, isTime bool) error {
@@ -33,6 +37,18 @@ func AddWorkflow(wf *models.PostWorkflow, isTime bool) error {
 	}
 
 	log.Printf("Add workflow: %s,execution time:%s\n", newWf.WorkflowName, newWf.DeployTime)
+
+	id, _ := utils.GetID()
+	logEntry := models.OperationLog{
+		ID:            id,
+		NodeName:      constants.Hostname,
+		NodeIP:        constants.IP,
+		OperationType: "add workflow",
+		Description:   fmt.Sprintf("Workflow %s added", wf.WorkflowName),
+		Result:        true,
+		CreatedAt:     time.Now(),
+	}
+	duckdb.InsertOperationLog(logEntry)
 
 	if isTime { //是定时发布
 		err := PushWorkflow(newWf)
