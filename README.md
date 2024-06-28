@@ -26,7 +26,7 @@ The service layer, a crucial part of EdgeGovernor, is responsible for managing c
 
 ## Framework Evaluation
 
-To evaluate the performance of EdgeGovernor in the autonomous management of edge clusters, we constructed a full-physical simulation cluster based on a cloud-edge collaborative architecture, composed of Raspberry Pi and Nvidia TX2 devices, with specific configurations as shown in Figure 3. The cluster architecture consists of one cloud node and three edge nodes. We simulated node failure scenarios by randomly starting and stopping devices. The experimental results show that in the case of disconnection between the cloud node and the system, EdgeGovernor can still manage and control the edge cluster stably, maintain data consistency, and ensure the normal execution of tasks. For specific experimental results, please refer to the demonstration video https://youtu.be/vXz17xd9SW0.
+To evaluate the performance of EdgeGovernor in the autonomous management of edge clusters, we constructed a full-physical simulation cluster based on a cloud-edge collaborative architecture, composed of Raspberry Pi and Nvidia TX2 devices. The cluster architecture consists of one cloud node and three edge nodes. We simulated node failure scenarios by randomly starting and stopping devices. The experimental results show that in the case of disconnection between the cloud node and the system, EdgeGovernor can still manage and control the edge cluster stably, maintain data consistency, and ensure the normal execution of tasks. For specific experimental results, please refer to the demonstration video https://youtu.be/vXz17xd9SW0.
 
 ![test1](./figures/test1.jpg)
 
