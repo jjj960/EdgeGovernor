@@ -1,7 +1,7 @@
 # EdgeGovernor
 EdgeGovernor is an IoT framework used for cloud edge collaboration and supporting edge autonomy. Compared with traditional cloud edge collaborative systems, EdgeGovernor enhances fault tolerance and adaptability.
 
-The demo video can be found at https://youtu.be/vXz17xd9SW0.
+The demo video can be found at https://youtu.be/7RuFTOSidIU.
 
 (1) EdgeGovernor endows IoT systems with the capability of edge cluster autonomy, ensuring cluster management even in the missing of cloud node failure. 
 
